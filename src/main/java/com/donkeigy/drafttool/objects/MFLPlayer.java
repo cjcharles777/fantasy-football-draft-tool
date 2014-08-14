@@ -52,4 +52,9 @@ public class MFLPlayer
     {
         this.twitterUsername = twitterUsername;
     }
+
+    @Override
+    public String toString() {
+        return getName() + " : " +getId();
+    }
 }

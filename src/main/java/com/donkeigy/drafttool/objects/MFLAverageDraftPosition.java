@@ -6,7 +6,8 @@ package com.donkeigy.drafttool.objects;
 public class MFLAverageDraftPosition
 {
     String  minPick;
-    String  maxPick;
+    String
+            maxPick;
     String draftsSelectedIn;
     String id;
     String averagePick;
