@@ -4,10 +4,7 @@ import com.donkeigy.drafttool.objects.MFLAverageDraftPosition;
 import com.donkeigy.drafttool.objects.MFLPlayer;
 import com.google.gson.*;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by cedric on 8/13/14.
@@ -40,9 +37,9 @@ public class MPLDataLoadUtil
         System.out.println("There is " + playerList.size() + " players in the list! ");
         return playerList;
     }
-    private static void loadADP()
+    public static Map<String, MFLAverageDraftPosition> loadADP()
     {
-        List<MFLAverageDraftPosition> playerADPList = new LinkedList<MFLAverageDraftPosition>();
+        Map<String, MFLAverageDraftPosition> playerADPMap = new HashMap<String, MFLAverageDraftPosition>();
         String result = DataRequestCaller.requestData("http://football.myfantasyleague.com/2014/export?TYPE=adp&FRANCHISES=12&IS_MOCK=0&IS_PPR=0&DAYS=7&JSON=1", "GET");
         Gson gson = new GsonBuilder().create();
         JsonObject jsonObject = gson.fromJson(result, JsonObject.class);
@@ -52,10 +49,11 @@ public class MPLDataLoadUtil
         while (iterator.hasNext())
         {
             MFLAverageDraftPosition tmpPlayerADP = gson.fromJson(iterator.next(), MFLAverageDraftPosition.class);
-            playerADPList.add(tmpPlayerADP);
+            playerADPMap.put(tmpPlayerADP.getId(), tmpPlayerADP);
             System.out.println("Added "+ tmpPlayerADP.getId()+ " has an average pick of "+ tmpPlayerADP.getAveragePick() + "");
 
         }
-        System.out.println("There is "+ playerADPList.size()+ " player ADPs in the list! ");
+        System.out.println("There is "+ playerADPMap.size()+ " player ADPs in the list! ");
+        return playerADPMap;
     }
 }

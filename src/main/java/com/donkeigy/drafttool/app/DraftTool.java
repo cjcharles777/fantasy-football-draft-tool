@@ -10,7 +10,7 @@ public class DraftTool
 {
     public static void main( String[] args )
     {
-        new DraftRepresentation("Test", MPLDataLoadUtil.loadPlayers());
+        new DraftRepresentation("Test", MPLDataLoadUtil.loadPlayers(), MPLDataLoadUtil.loadADP());
         //MPLDataLoadUtil.loadData();
     }
 }

@@ -16,11 +16,11 @@ public class DraftTableModel extends AbstractTableModel
         this.draft = draft;
     }
     public int getColumnCount() {
-        return draft.length;
+        return draft[0].length;
     }
 
     public int getRowCount() {
-        return draft[0].length;
+        return draft.length;
     }
 
     public Object getValueAt(int row, int col) {
