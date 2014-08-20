@@ -1,18 +1,15 @@
 package com.donkeigy.drafttool.gui;
 
-import com.donkeigy.drafttool.gui.models.ADPTableModel;
-import com.donkeigy.drafttool.gui.models.DraftTableModel;
+import com.donkeigy.drafttool.engine.DraftEngine;
+import com.donkeigy.drafttool.engine.exception.DraftIsCompleteException;
+import com.donkeigy.drafttool.engine.exception.PlayerIsUndraftableException;
 import com.donkeigy.drafttool.objects.MFLAverageDraftPosition;
 import com.donkeigy.drafttool.objects.MFLPlayer;
 
 import javax.swing.*;
 
-import com.donkeigy.drafttool.predicates.NegativePickHighlightPredicate;
-import com.donkeigy.drafttool.predicates.PositivePickHighlightPredicate;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,19 +24,17 @@ import java.util.Map;
 public class DraftRepresentation extends JFrame
 {
     private JTable table1;
-    private JXTable jXTable1;
+    private JXTable DraftJXTable;
     private JScrollPane scrollPane;
-    private MFLPlayer[][] draft = new MFLPlayer[10][12];
-    private int round =0;
-    private int currentTeam = 0;
-    private int currentPick=0;
+
+
     private List<MFLPlayer> playerList;
     private Map<String, MFLAverageDraftPosition> averageDraftPositionMap;
     private JPanel      panel;
     private JTextField textField1;
     private JButton button1;
     private JTable table2;
-    private JXTable jXTable2;
+    private JXTable ADPJXTable;
     private JPanel draftInputTextPanel;
     private JPanel draftInputAcceptPanel;
     private JPanel draftBoardPanel;
@@ -47,8 +42,7 @@ public class DraftRepresentation extends JFrame
     private JPanel draftInputPanel;
     private JPanel playerADPPanel;
     private Map<String, MFLPlayer> playerNames;
-    private DraftTableModel draftTableModel;
-    private ADPTableModel adpTableModel;
+    private DraftEngine draftEngine;
 
     private static final String COMMIT_ACTION = "commit";
 
@@ -66,28 +60,11 @@ public class DraftRepresentation extends JFrame
         }
 
 
-        draftTableModel = new DraftTableModel(draft);
-        adpTableModel = new ADPTableModel(playerList,averageDraftPositionMap);
-        jXTable1.setModel(draftTableModel);
-        jXTable2.setModel(adpTableModel);
-        jXTable1.packTable(0); // had to do this due to intellij GUI Builder
-        jXTable2.packTable(0);
 
-        final NegativePickHighlightPredicate negativePredicate = new NegativePickHighlightPredicate(currentPick);
 
-        ColorHighlighter negHighlighter = new ColorHighlighter(negativePredicate,
-                Color.RED,   // background color
-                null);       // no change in foreground color
+        draftEngine = new DraftEngine(new MFLPlayer[10][12], DraftJXTable, ADPJXTable);
+        draftEngine.init(this.playerList, this.averageDraftPositionMap);
 
-        jXTable2.addHighlighter(negHighlighter);
-
-        final PositivePickHighlightPredicate positivePredicate = new PositivePickHighlightPredicate(currentPick);
-
-        ColorHighlighter posHighlighter = new ColorHighlighter(positivePredicate,
-                Color.GREEN,   // background color
-                null);       // no change in foreground color
-
-        jXTable2.addHighlighter(posHighlighter);
 
         button1.setActionCommand("DRAFT_PLAYER");
 
@@ -106,10 +83,18 @@ public class DraftRepresentation extends JFrame
                     String mplPlayerStr = textField1.getText();
                     String [] mplPlayerStrData = mplPlayerStr.split(":");
                     MFLPlayer player = playerNames.get(mplPlayerStrData[1].trim()); // helps retrieve data from the maps
-                    addToDraft(player);
-                    draftTableModel.fireTableDataChanged();
-                    negativePredicate.setCurrentDraftPick(currentPick);
-                    positivePredicate.setCurrentDraftPick(currentPick);
+                    try
+                    {
+                        draftEngine.addToDraft(player);
+                    }
+                    catch (PlayerIsUndraftableException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                    catch (DraftIsCompleteException e1)
+                    {
+                        e1.printStackTrace();
+                    }
 
                 }
             }
@@ -127,28 +112,14 @@ public class DraftRepresentation extends JFrame
 
     }
 
-    private void addToDraft(MFLPlayer player) // engine for the draft
-    {
-        if (round < draft.length)
-        {
-            draft[round][currentTeam] = player;
-            currentPick++;
-            currentTeam++;
-            if(currentTeam >= draft[round].length)
-            {
-                currentTeam = 0;
-                round++;
-            }
 
-        }
-    }
 
     private void createUIComponents() {
 
-        jXTable1 = new JXTable();
-        jXTable2 = new JXTable();
-        table1 = jXTable1;
-        table2 = jXTable2;
+        DraftJXTable = new JXTable();
+        ADPJXTable = new JXTable();
+        table1 = DraftJXTable;
+        table2 = ADPJXTable;
 
 
 
