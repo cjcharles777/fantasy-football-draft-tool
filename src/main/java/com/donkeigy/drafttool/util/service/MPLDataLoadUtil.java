@@ -1,7 +1,8 @@
-package com.donkeigy.drafttool.util;
+package com.donkeigy.drafttool.util.service;
 
 import com.donkeigy.drafttool.objects.MFLAverageDraftPosition;
 import com.donkeigy.drafttool.objects.MFLPlayer;
+import com.donkeigy.drafttool.util.DataRequestCaller;
 import com.google.gson.*;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class MPLDataLoadUtil
     public static List<MFLPlayer> loadPlayers()
     {
         List<MFLPlayer> playerList = new LinkedList<MFLPlayer>();
-        String result = DataRequestCaller.requestData("http://football.myfantasyleague.com/2014/export?TYPE=players&DETAILS=1&JSON=1","GET");
+        String result = DataRequestCaller.requestData("http://football.myfantasyleague.com/2014/export?TYPE=players&DETAILS=1&JSON=1", "GET");
         Gson gson = new GsonBuilder().create();
         JsonObject jsonObject = gson.fromJson(result, JsonObject.class);
         jsonObject = jsonObject.get("players").getAsJsonObject();
