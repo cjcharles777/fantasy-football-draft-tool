@@ -4,13 +4,13 @@
  */
 package com.donkeigy.drafttool.objects.yahoo.league;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 
 /**
  *
  * @author cedric
  */
-@JsonIgnoreProperties({"stat_position_types"})
+
 class YahooStatCategory 
 {
           private String  stat_id;

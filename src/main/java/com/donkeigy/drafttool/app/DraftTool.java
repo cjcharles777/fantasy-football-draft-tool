@@ -1,7 +1,7 @@
 package com.donkeigy.drafttool.app;
 
 import com.donkeigy.drafttool.gui.DraftRepresentation;
-import com.donkeigy.drafttool.util.service.MPLDataLoadUtil;
+import com.donkeigy.drafttool.util.service.MPLDataLoad;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -15,7 +15,7 @@ public class DraftTool
     public static void main( String[] args )
     {
 
-        new DraftRepresentation("Test", MPLDataLoadUtil.loadPlayers(), MPLDataLoadUtil.loadADP());
-        //MPLDataLoadUtil.loadData();
+        new DraftRepresentation("Test", applicationContext);
+        //MPLDataLoad.loadData();
     }
 }

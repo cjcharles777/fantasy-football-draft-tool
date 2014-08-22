@@ -1,13 +1,14 @@
-package com.donkeigy.drafttool.objects;
+package com.donkeigy.drafttool.objects.adp;
+
+import java.math.BigDecimal;
 
 /**
  * Created by cedric on 8/13/14.
  */
-public class MFLAverageDraftPosition
+public class MFLAverageDraftPosition extends FantasyFootballADP
 {
-    String  minPick;
-    String
-            maxPick;
+    String minPick;
+    String maxPick;
     String draftsSelectedIn;
     String id;
     String averagePick;
@@ -48,7 +49,13 @@ public class MFLAverageDraftPosition
         return averagePick;
     }
 
-    public void setAveragePick(String averagePick) {
+    public void setAveragePick(String averagePick)
+    {
         this.averagePick = averagePick;
+    }
+
+    @Override
+    public BigDecimal getAdp() {
+        return new BigDecimal(averagePick);
     }
 }

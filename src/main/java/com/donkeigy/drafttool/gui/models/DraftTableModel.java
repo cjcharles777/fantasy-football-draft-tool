@@ -1,6 +1,6 @@
 package com.donkeigy.drafttool.gui.models;
 
-import com.donkeigy.drafttool.objects.MFLPlayer;
+import com.donkeigy.drafttool.objects.players.MFLPlayer;
 
 import javax.swing.table.AbstractTableModel;
 

@@ -1,7 +1,8 @@
 package com.donkeigy.drafttool.gui.models;
 
-import com.donkeigy.drafttool.objects.MFLAverageDraftPosition;
-import com.donkeigy.drafttool.objects.MFLPlayer;
+import com.donkeigy.drafttool.objects.adp.FantasyFootballADP;
+import com.donkeigy.drafttool.objects.adp.MFLAverageDraftPosition;
+import com.donkeigy.drafttool.objects.hibernate.Player;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
@@ -13,12 +14,12 @@ import java.util.Map;
  */
 public class ADPTableModel extends AbstractTableModel
 {
-    private List<MFLPlayer> playerList;
-    private Map<String,MFLAverageDraftPosition> adpMap;
+    private List<Player> playerList;
+    private Map<String,FantasyFootballADP> adpMap;
 
-    private String[] columnNames = {"Player", "Team", "Position", "Avg. Pick", "Min. Pick", "Max Pick"};
-    private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Integer.class, Integer.class};
-    public ADPTableModel(List<MFLPlayer> playerList, Map<String, MFLAverageDraftPosition> adpMap) {
+    private String[] columnNames = {"Player", "Team", "Position", "Avg. Pick"};
+    private Class[] columnClasses = {String.class, String.class, String.class, Double.class};
+    public ADPTableModel(List<Player> playerList, Map<String, FantasyFootballADP> adpMap) {
         this.playerList = playerList;
         this.adpMap = adpMap;
     }
@@ -30,28 +31,25 @@ public class ADPTableModel extends AbstractTableModel
 
     @Override
     public int getColumnCount() {
-        return 6;
+        return 4;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        MFLPlayer player = playerList.get(rowIndex);
-        MFLAverageDraftPosition adp = adpMap.get(player.getId());
+        Player player = playerList.get(rowIndex);
+        FantasyFootballADP adp = adpMap.get(player.getPlayer_id());
         try
         {
             switch (columnIndex)
             {
-                case 0: return player.getName();
+                case 0: return player.getName().getFull();
 
-                case 1: return player.getTeam();
+                case 1: return player.getEditorial_team_abbr();
 
-                case 2: return player.getPosition();
+                case 2: return player.getDisplay_position();
 
-                case 3: return new BigDecimal(adp.getAveragePick()).doubleValue(); // casting into numerical value for sorting
+                case 3: return adp.getAdp().doubleValue(); // casting into numerical value for sorting
 
-                case 4: return new BigDecimal(adp.getMinPick()).intValue();
-
-                case 5: return new BigDecimal(adp.getMaxPick()).intValue();
 
                 default: return null;
 
@@ -59,7 +57,7 @@ public class ADPTableModel extends AbstractTableModel
         }
         catch (NullPointerException e)
         {
-            //System.err.println("");
+            System.err.println("");
             return null;
         }
 

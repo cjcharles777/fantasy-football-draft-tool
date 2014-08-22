@@ -3,13 +3,17 @@ package com.donkeigy.drafttool.gui;
 import com.donkeigy.drafttool.engine.DraftEngine;
 import com.donkeigy.drafttool.engine.exception.DraftIsCompleteException;
 import com.donkeigy.drafttool.engine.exception.PlayerIsUndraftableException;
-import com.donkeigy.drafttool.objects.MFLAverageDraftPosition;
-import com.donkeigy.drafttool.objects.MFLPlayer;
+import com.donkeigy.drafttool.objects.adp.MFLAverageDraftPosition;
+import com.donkeigy.drafttool.objects.players.MFLPlayer;
 
 import javax.swing.*;
 
+import com.donkeigy.drafttool.objects.yahoo.league.YahooLeague;
+import com.donkeigy.drafttool.service.YahooDataService;
+import com.donkeigy.drafttool.util.OAuthConnection;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import org.springframework.context.ApplicationContext;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,33 +45,35 @@ public class DraftRepresentation extends JFrame
     private JPanel draftPanel;
     private JPanel draftInputPanel;
     private JPanel playerADPPanel;
+    private JPanel loadPanel;
+    private JButton loadYahooButton;
     private Map<String, MFLPlayer> playerNames;
     private DraftEngine draftEngine;
+    private ApplicationContext applicationContext;
+    private OAuthConnection conn;
+    private YahooDataService yahooDataService;
 
     private static final String COMMIT_ACTION = "commit";
 
-    public DraftRepresentation (String title, List<MFLPlayer> playerList, Map<String, MFLAverageDraftPosition> averageDraftPositionMap) throws HeadlessException
+    public DraftRepresentation (String title, ApplicationContext applicationContext) throws HeadlessException
     {
         super(title);
-        this.playerList = playerList;
-        this.averageDraftPositionMap = averageDraftPositionMap;
-
+        this.applicationContext = applicationContext;
+        conn = applicationContext.getBean(OAuthConnection.class);
+        yahooDataService = applicationContext.getBean(YahooDataService.class);
         playerNames = new HashMap<String, MFLPlayer>();
 
-        for(MFLPlayer player : playerList)
-        {
-            playerNames.put(player.getId(), player); // prepare player pool
-        }
 
 
 
 
-        draftEngine = new DraftEngine(new MFLPlayer[10][12], DraftJXTable, ADPJXTable);
-        draftEngine.init(this.playerList, this.averageDraftPositionMap);
+
+        draftEngine = new DraftEngine(new MFLPlayer[10][12], DraftJXTable, ADPJXTable,applicationContext);
+        draftEngine.init();
 
 
         button1.setActionCommand("DRAFT_PLAYER");
-
+        loadYahooButton.setActionCommand("LOAD_YAHOO");
         //AutoCompleteDecorator.decorate(comboBox1);
         // change true to false to disable string restriction
         AutoCompleteDecorator.decorate(textField1, playerList, true); // autocomplete sexiness
@@ -109,9 +115,41 @@ public class DraftRepresentation extends JFrame
         setVisible(true);
 
 
+        loadYahooButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cmd = e.getActionCommand();
+                if (cmd.equals("LOAD_YAHOO")) //action for load button;
+                {
 
+                    if(!conn.connect())
+                    {
+                        showYahooOauthDialog();
+
+                    }
+                    else
+                    {
+                        showYahooLoadDialog();
+                    }
+                }
+            }
+        });
     }
 
+    private void showYahooOauthDialog()
+    {
+        YahooOauthDialog dialog = new YahooOauthDialog(conn, this);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+
+    public void showYahooLoadDialog()
+    {
+        List<YahooLeague> userLeagues = yahooDataService.getUserLeagues("nfl");
+        YahooTeamChoiceDialog dialog = new YahooTeamChoiceDialog(userLeagues, draftEngine);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
 
 
     private void createUIComponents() {

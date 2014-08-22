@@ -1,11 +1,13 @@
 package com.donkeigy.drafttool.service;
 
+import com.donkeigy.drafttool.objects.hibernate.Player;
 import com.donkeigy.drafttool.objects.yahoo.league.YahooLeague;
 import com.donkeigy.drafttool.objects.yahoo.league.YahooLeagueSettings;
 import com.donkeigy.drafttool.objects.yahoo.league.draft.DraftResults;
 import com.donkeigy.drafttool.util.YQLQueryUtil;
 import com.google.gson.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,22 +18,50 @@ import java.util.logging.Logger;
 /**
  * Created by cedric on 8/20/14.
  */
+@Repository("yahooDataService")
 public class YahooDataService
 {
     @Autowired
     private YQLQueryUtil yqlUitl ;
 
 
-    public void retriveLeaugePlayers(String leagueid)
+    public List<Player>  retriveLeaugePlayers(String leagueid)
     {
         Gson gson = new GsonBuilder().create();
 
         JsonObject userData;
         JsonObject  results;
-        JsonArray leaugeList;
+        JsonArray playerList;
         JsonObject  query;
-        String yql = "select * from fantasysports.players where league_key='"+leagueid+"'";
-        String response = yqlUitl.queryYQL(yql);
+        int start = 0;
+        boolean morePlayers = true;
+        List<Player> leaguePlayerResults = new LinkedList<Player>();
+
+       while(morePlayers) {
+           String yql = "select * from fantasysports.players where league_key='"+leagueid+"' and start="+start;
+           String response = yqlUitl.queryYQL(yql);
+           try {
+               userData = gson.fromJson(response, JsonObject.class).getAsJsonObject();
+               query = userData.get("query").getAsJsonObject(); // query details
+               int count = query.get("count").getAsInt();
+               results = query.get("results").getAsJsonObject(); //result details
+               playerList = (JsonArray) results.get("player"); //result details
+               for (JsonElement leauge : playerList) {
+                   Player tempLeauge = gson.fromJson(leauge, Player.class);
+                   leaguePlayerResults.add(tempLeauge);
+               }
+               start += count;
+               Logger.getLogger(YahooDataService.class.getName()).log(Level.INFO, "Start Count : " + start);
+               if (count < 25) {
+                   morePlayers = false;
+               }
+
+           } catch (Exception e) {
+               Logger.getLogger(YahooDataService.class.getName()).log(Level.SEVERE, null, e);
+           }
+       }
+        return leaguePlayerResults;
+
 
         //Todo: process this query
     }

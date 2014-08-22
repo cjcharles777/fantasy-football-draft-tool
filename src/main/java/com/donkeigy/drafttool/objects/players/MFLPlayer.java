@@ -1,9 +1,12 @@
-package com.donkeigy.drafttool.objects;
+package com.donkeigy.drafttool.objects.players;
+
+import com.donkeigy.drafttool.objects.hibernate.Name;
+import com.donkeigy.drafttool.objects.hibernate.Player;
 
 /**
  * Created by cedric on 8/13/14.
  */
-public class MFLPlayer
+public class MFLPlayer extends FantasyFootBallPlayer
 {
     String position;
     String name;
@@ -56,5 +59,27 @@ public class MFLPlayer
     @Override
     public String toString() {
         return getName() + " : " +getId();
+    }
+
+    @Override
+    public Player createExampleYahooPlayer()
+    {
+        Player resultPlayer = new Player();
+        Name resultName = new Name();
+        String [] playerNameArray = name.split(",");
+        if(playerNameArray.length > 1)
+        {
+            resultName.setLast(playerNameArray[0].trim());
+            resultName.setFirst(playerNameArray[1].trim());
+        }
+        else
+        {
+            resultName.setFull(name);
+        }
+        resultPlayer.setName(resultName);
+        //resultPlayer.setEditorial_team_abbr(team);
+        //resultPlayer.setDisplay_position(position);
+        return resultPlayer;
+
     }
 }
