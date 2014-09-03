@@ -12,6 +12,12 @@
             <id>cdiddy-maven2</id>
             <url>http://donkeigy-mass-distraction-device.pw/maven2</url>
         </repository>
+        <repository>
+            <id>java.net.m2repo</id>
+            <name>java.net Maven 2 Repository</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <dependencies>

@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS;
+
 /**
  * Created by cedric on 8/13/14.
  */
@@ -158,6 +160,8 @@ public class DraftRepresentation extends JFrame
         ADPJXTable = new JXTable();
         table1 = DraftJXTable;
         table2 = ADPJXTable;
+        DraftJXTable.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
+
 
 
 

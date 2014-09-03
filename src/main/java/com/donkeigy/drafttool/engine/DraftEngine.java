@@ -132,5 +132,6 @@ public class DraftEngine
         averageDraftPositionMap.putAll(mplDataLoad.getAdpMap());
         this.playerList.addAll(players);
         adpTableModel.fireTableDataChanged();
+        playerListTable.packTable(0);
     }
 }
