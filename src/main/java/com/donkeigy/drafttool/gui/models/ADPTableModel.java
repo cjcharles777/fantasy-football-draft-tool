@@ -17,8 +17,8 @@ public class ADPTableModel extends AbstractTableModel
     private List<Player> playerList;
     private Map<String,FantasyFootballADP> adpMap;
 
-    private String[] columnNames = {"Player", "Team", "Position", "Avg. Pick"};
-    private Class[] columnClasses = {String.class, String.class, String.class, Double.class};
+    private String[] columnNames = {"Player", "Team", "Position", "Avg. Pick", "% of Drafts"};
+    private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Double.class};
     public ADPTableModel(List<Player> playerList, Map<String, FantasyFootballADP> adpMap) {
         this.playerList = playerList;
         this.adpMap = adpMap;
@@ -31,7 +31,7 @@ public class ADPTableModel extends AbstractTableModel
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -50,6 +50,7 @@ public class ADPTableModel extends AbstractTableModel
 
                 case 3: return adp.getAdp().doubleValue(); // casting into numerical value for sorting
 
+                case 4: return adp.getPrecentageOfDrafts().doubleValue();
 
                 default: return null;
 

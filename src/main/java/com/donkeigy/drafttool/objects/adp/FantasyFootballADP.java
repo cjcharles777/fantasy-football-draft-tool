@@ -9,6 +9,7 @@ public abstract class FantasyFootballADP
 {
 
     public abstract BigDecimal getAdp();
+    public abstract BigDecimal getPrecentageOfDrafts();
 
 
 }

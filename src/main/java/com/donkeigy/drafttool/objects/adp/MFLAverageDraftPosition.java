@@ -12,6 +12,7 @@ public class MFLAverageDraftPosition extends FantasyFootballADP
     String draftsSelectedIn;
     String id;
     String averagePick;
+    private static int numberOfDrafts = 0;
 
     public String getMinPick() {
         return minPick;
@@ -54,8 +55,30 @@ public class MFLAverageDraftPosition extends FantasyFootballADP
         this.averagePick = averagePick;
     }
 
+    public static int getNumberOfDrafts() {
+        return numberOfDrafts;
+    }
+
+    public static void setNumberOfDrafts(int numberOfDrafts) {
+        MFLAverageDraftPosition.numberOfDrafts = numberOfDrafts;
+    }
+
     @Override
     public BigDecimal getAdp() {
         return new BigDecimal(averagePick);
+    }
+
+    @Override
+    public BigDecimal getPrecentageOfDrafts() {
+        if (draftsSelectedIn != null && numberOfDrafts > 0)
+        {
+            BigDecimal selectedNum = new BigDecimal(draftsSelectedIn);
+            BigDecimal totalDraftNum = new BigDecimal(numberOfDrafts);
+            return selectedNum.divide(totalDraftNum,2,BigDecimal.ROUND_HALF_UP);
+        }
+        else
+        {
+            return new BigDecimal(0);
+        }
     }
 }
