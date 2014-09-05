@@ -77,16 +77,30 @@ public class MFLPlayer extends FantasyFootBallPlayer
         {
             resultName.setFirst(playerNameArray[1].trim());
             resultName.setFull(playerNameArray[1].trim());
+            resultPlayer.setEditorial_team_full_name(playerNameArray[1].trim() +" "+playerNameArray[0].trim());
         }
         else
         {
             resultName.setFull(name);
+        }
+        if (resultName.getFirst() != null && resultName.getFirst().equals("E.J."))
+        {
+            resultName.setFirst("EJ");
+        }
+        if ((resultName.getFirst() != null && resultName.getFirst().equals("Cecil"))&&
+                (resultName.getLast() != null && resultName.getLast().equals("Shorts")))
+        {
+            resultName.setLast("Shorts III");
         }
         resultPlayer.setName(resultName);
         //resultPlayer.setEditorial_team_abbr(team);
         if(position.equals("Def"))
         {
            position = position.toUpperCase();
+        }
+        else if(position.equals("PK"))
+        {
+            position = "K";
         }
 
 

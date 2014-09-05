@@ -1,7 +1,6 @@
 package com.donkeigy.drafttool.app;
 
 import com.donkeigy.drafttool.gui.DraftRepresentation;
-import com.donkeigy.drafttool.util.service.MPLDataLoad;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -14,10 +14,10 @@ import java.util.*;
 /**
  * Created by cedric on 8/13/14.
  */
-public class MPLDataLoad extends FFDataLoad
+public class MFLDataLoad extends FFDataLoad
 {
 
-    public MPLDataLoad(PlayersDAO playersDAO)
+    public MFLDataLoad(PlayersDAO playersDAO)
     {
         super (playersDAO);
     }

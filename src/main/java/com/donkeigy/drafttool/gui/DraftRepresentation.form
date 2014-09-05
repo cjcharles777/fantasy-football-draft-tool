@@ -65,7 +65,7 @@
                   <component id="d43de" class="javax.swing.JTable" binding="table1" custom-create="true" default-binding="true">
                     <constraints/>
                     <properties>
-                      <autoCreateRowSorter value="false"/>
+                      <autoCreateRowSorter value="true"/>
                       <autoResizeMode value="4"/>
                       <enabled value="true"/>
                     </properties>

@@ -17,7 +17,8 @@ import com.donkeigy.drafttool.predicates.NegativeDraftPositionHighlightPredicate
 import com.donkeigy.drafttool.predicates.PositiveADPHighlightPredicate;
 import com.donkeigy.drafttool.predicates.PositiveDraftPositionHighlightPredicate;
 import com.donkeigy.drafttool.service.YahooDataService;
-import com.donkeigy.drafttool.util.service.MPLDataLoad;
+import com.donkeigy.drafttool.util.service.MFLDataLoad;
+import com.donkeigy.drafttool.util.service.YahooDataLoad;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.springframework.context.ApplicationContext;
@@ -155,8 +156,10 @@ public class DraftEngine
         List<Player> players = yahooDataService.retriveLeaugePlayers(leauge.getLeague_key());
         playersDAO.clearPlayers();
         playersDAO.savePlayers(players);
-        MPLDataLoad mplDataLoad = new MPLDataLoad(playersDAO);
-        averageDraftPositionMap.putAll(mplDataLoad.getAdpMap());
+        YahooDataLoad yahooDataLoad = new YahooDataLoad(playersDAO);
+        //MFLDataLoad MFLDataLoad = new MFLDataLoad(playersDAO);
+        //averageDraftPositionMap.putAll(mplDataLoad.getAdpMap()); // my FantasyLeague adp
+        averageDraftPositionMap.putAll(yahooDataLoad.getAdpMap());
         this.playerList.addAll(players);
         adpTableModel.fireTableDataChanged();
         playerListTable.packTable(0);
@@ -179,7 +182,7 @@ public class DraftEngine
         executeDraftResults(draftResults);
         draftTableModel = new DraftTableModel(draft);
         draftTable.setModel(draftTableModel);
-        draftTable.packTable(0);
+       // draftTable.packTable(0);
 
     }
     private void executeDraftResults(DraftResults results)
