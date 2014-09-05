@@ -1,18 +1,21 @@
 package com.donkeigy.drafttool.engine;
 
 import com.donkeigy.drafttool.dao.PlayersDAO;
-import com.donkeigy.drafttool.dao.PlayersDAOImpl;
 import com.donkeigy.drafttool.engine.exception.DraftIsCompleteException;
 import com.donkeigy.drafttool.engine.exception.PlayerIsUndraftableException;
 import com.donkeigy.drafttool.gui.models.ADPTableModel;
 import com.donkeigy.drafttool.gui.models.DraftTableModel;
 import com.donkeigy.drafttool.objects.adp.FantasyFootballADP;
-import com.donkeigy.drafttool.objects.adp.MFLAverageDraftPosition;
-import com.donkeigy.drafttool.objects.players.MFLPlayer;
 import com.donkeigy.drafttool.objects.hibernate.Player;
 import com.donkeigy.drafttool.objects.yahoo.league.YahooLeague;
-import com.donkeigy.drafttool.predicates.NegativePickHighlightPredicate;
-import com.donkeigy.drafttool.predicates.PositivePickHighlightPredicate;
+import com.donkeigy.drafttool.objects.yahoo.league.YahooLeagueRosterPosition;
+import com.donkeigy.drafttool.objects.yahoo.league.YahooLeagueSettings;
+import com.donkeigy.drafttool.objects.yahoo.league.draft.DraftPick;
+import com.donkeigy.drafttool.objects.yahoo.league.draft.DraftResults;
+import com.donkeigy.drafttool.predicates.NegativeADPHighlightPredicate;
+import com.donkeigy.drafttool.predicates.NegativeDraftPositionHighlightPredicate;
+import com.donkeigy.drafttool.predicates.PositiveADPHighlightPredicate;
+import com.donkeigy.drafttool.predicates.PositiveDraftPositionHighlightPredicate;
 import com.donkeigy.drafttool.service.YahooDataService;
 import com.donkeigy.drafttool.util.service.MPLDataLoad;
 import org.jdesktop.swingx.JXTable;
@@ -30,7 +33,7 @@ import java.util.Map;
  */
 public class DraftEngine
 {
-    private MFLPlayer[][] draft;
+    private Player[][] draft;
     private int round =0;
     private int currentTeam = 0;
     private int currentPick=0;
@@ -40,13 +43,15 @@ public class DraftEngine
     private JXTable playerListTable;
     private List<Player> playerList;
     private Map<String, FantasyFootballADP> averageDraftPositionMap;
-    private NegativePickHighlightPredicate negativePredicate;
-    private PositivePickHighlightPredicate positivePredicate;
+    private NegativeADPHighlightPredicate negativeADPHighlightPredicate;
+    private PositiveADPHighlightPredicate positiveADPHighlightPredicate;
+    private PositiveDraftPositionHighlightPredicate positivePickHighlightPredicate;
+    private NegativeDraftPositionHighlightPredicate negativePickHighlightPredicate;
     private ApplicationContext applicationContext;
     private YahooDataService yahooDataService;
     private PlayersDAO playersDAO;
 
-    public DraftEngine(MFLPlayer[][] draft, JXTable draftTable, JXTable playerListTable, ApplicationContext applicationContext)
+    public DraftEngine(Player[][] draft, JXTable draftTable, JXTable playerListTable, ApplicationContext applicationContext)
     {
         this.applicationContext = applicationContext;
         this.yahooDataService = applicationContext.getBean(YahooDataService.class);
@@ -74,24 +79,46 @@ public class DraftEngine
         draftTable.packTable(0); // had to do this due to intellij GUI Builder
         playerListTable.packTable(0);
 
-        negativePredicate = new NegativePickHighlightPredicate(currentPick);
+        negativeADPHighlightPredicate = new NegativeADPHighlightPredicate(currentPick);
 
-        ColorHighlighter negHighlighter = new ColorHighlighter(negativePredicate,
+        ColorHighlighter negAdpHighlighter = new ColorHighlighter(negativeADPHighlightPredicate,
                 Color.RED,   // background color
                 null);       // no change in foreground color
 
-        playerListTable.addHighlighter(negHighlighter);
+        playerListTable.addHighlighter(negAdpHighlighter);
 
-        positivePredicate = new PositivePickHighlightPredicate(currentPick);
+        positiveADPHighlightPredicate = new PositiveADPHighlightPredicate(currentPick);
 
-        ColorHighlighter posHighlighter = new ColorHighlighter(positivePredicate,
+        ColorHighlighter posAdpHighlighter = new ColorHighlighter(positiveADPHighlightPredicate,
                 Color.GREEN,   // background color
                 null);       // no change in foreground color
 
-        playerListTable.addHighlighter(posHighlighter);
+        playerListTable.addHighlighter(posAdpHighlighter);
+
+
+
+        negativePickHighlightPredicate = new NegativeDraftPositionHighlightPredicate(this.averageDraftPositionMap);
+
+        ColorHighlighter negativePickHighlighter = new ColorHighlighter(negativePickHighlightPredicate,
+                Color.RED,   // background color
+                null);       // no change in foreground color
+
+        draftTable.addHighlighter(negativePickHighlighter);
+
+        positivePickHighlightPredicate = new PositiveDraftPositionHighlightPredicate(this.averageDraftPositionMap);
+
+        ColorHighlighter positivePickHighlighter = new ColorHighlighter(positivePickHighlightPredicate,
+                Color.GREEN,   // background color
+                null);       // no change in foreground color
+
+        draftTable.addHighlighter(positivePickHighlighter);
+
+
+
+
     }
 
-    public void addToDraft(MFLPlayer player) throws PlayerIsUndraftableException, DraftIsCompleteException // engine for the draft
+    public void addToDraft(Player player) throws PlayerIsUndraftableException, DraftIsCompleteException // engine for the draft
     {
         if (playerList.contains(player))
         {
@@ -107,8 +134,8 @@ public class DraftEngine
                 }
                 draftTableModel.fireTableDataChanged();
                 adpTableModel.fireTableDataChanged();
-                negativePredicate.setCurrentDraftPick(currentPick);
-                positivePredicate.setCurrentDraftPick(currentPick);
+                negativeADPHighlightPredicate.setCurrentDraftPick(currentPick);
+                positiveADPHighlightPredicate.setCurrentDraftPick(currentPick);
 
 
             }
@@ -133,5 +160,45 @@ public class DraftEngine
         this.playerList.addAll(players);
         adpTableModel.fireTableDataChanged();
         playerListTable.packTable(0);
+
+        //start setting up draft board array
+        int numTeams = Integer.parseInt(leauge.getNum_teams());
+        int rounds = 0;
+        YahooLeagueSettings leagueSettings = yahooDataService.getLeagueSettings(leauge.getLeague_key());
+        List<YahooLeagueRosterPosition> rosterPositions = leagueSettings.getRoster_positions().getRoster_position();
+        for(YahooLeagueRosterPosition rosterPosition: rosterPositions)
+        {
+            if(!rosterPosition.getPosition().equals("IR"))
+            {
+                rounds+=Integer.parseInt(rosterPosition.getCount());
+            }
+
+        }
+        draft = new Player[rounds][numTeams];
+        DraftResults draftResults = yahooDataService.getDraftResults(leauge.getLeague_key());
+        executeDraftResults(draftResults);
+        draftTableModel = new DraftTableModel(draft);
+        draftTable.setModel(draftTableModel);
+        draftTable.packTable(0);
+
+    }
+    private void executeDraftResults(DraftResults results)
+    {
+        List <DraftPick> pickList =  results.getDraft_result();
+        Map<String, Player> playerKeyMap = new HashMap<String, Player>();
+        for(Player p :this.playerList)
+        {
+            playerKeyMap.put(p.getPlayer_key(),p);
+        }
+        int teams = draft[0].length;
+        for(DraftPick pick : pickList)
+        {
+
+            int pickNum = Integer.parseInt(pick.getPick());
+            System.out.println("Now for round "+((pickNum-1)/teams) +" and pick " + ((pickNum-1)%teams));
+            draft[(pickNum-1)/teams][(pickNum-1)%teams] = playerKeyMap.get(pick.getPlayer_key());
+
+            System.out.println("Added "+ pick.getPlayer_key()+" to Draft");
+        }
     }
 }

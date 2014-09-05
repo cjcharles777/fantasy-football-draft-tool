@@ -276,6 +276,12 @@ package com.donkeigy.drafttool.objects.hibernate;
          this.on_disabled_list = on_disabled_list;
      }
 
-
-
+     @Override
+     public String toString() {
+         if (name != null)
+         {
+             return name.getFull();
+         }
+         return super.toString();
+     }
  }

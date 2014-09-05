@@ -17,7 +17,7 @@ public class ADPTableModel extends AbstractTableModel
     private List<Player> playerList;
     private Map<String,FantasyFootballADP> adpMap;
 
-    private String[] columnNames = {"Player", "Team", "Position", "Avg. Pick", "% of Drafts"};
+    private String[] columnNames = {"Player", "Team", "Position", "MFL ADP", "% of Drafts"};
     private Class[] columnClasses = {String.class, String.class, String.class, Double.class, Double.class};
     public ADPTableModel(List<Player> playerList, Map<String, FantasyFootballADP> adpMap) {
         this.playerList = playerList;

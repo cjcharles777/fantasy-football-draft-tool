@@ -8,11 +8,11 @@ import java.awt.*;
 /**
  * Created by cedric on 8/14/14.
  */
-public class NegativePickHighlightPredicate implements HighlightPredicate
+public class PositiveADPHighlightPredicate implements HighlightPredicate
 {
     private int currentDraftPick;
 
-    public NegativePickHighlightPredicate(int currentDraftPick) {
+    public PositiveADPHighlightPredicate(int currentDraftPick) {
         super();
         this.currentDraftPick = currentDraftPick;
     }
@@ -24,7 +24,7 @@ public class NegativePickHighlightPredicate implements HighlightPredicate
 
         Object obj  = adapter.getValue();
         Number item;
-        if(adapter.getValue() instanceof Number)
+        if(adapter.getValue() instanceof Number && adapter.getColumnName(adapter.column).contains("ADP"))
         {
             item = (Number) obj;
             return testItem(item);
@@ -35,8 +35,9 @@ public class NegativePickHighlightPredicate implements HighlightPredicate
     }
     public boolean testItem(Number item)
     {
-        return (item.doubleValue() > currentDraftPick);
+        return (item.doubleValue() < currentDraftPick);
     }
+
     public int getCurrentDraftPick() {
         return currentDraftPick;
     }

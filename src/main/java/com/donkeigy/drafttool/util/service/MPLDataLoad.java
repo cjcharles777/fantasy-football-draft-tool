@@ -28,7 +28,7 @@ public class MPLDataLoad extends FFDataLoad
 
     }
 
-    public void loadPlayers()
+    private void loadPlayers()
     {
         playerList = new LinkedList<FantasyFootBallPlayer>();
         playerIDMap = new HashMap<String, Player>();
@@ -47,24 +47,45 @@ public class MPLDataLoad extends FFDataLoad
            if(dbPlayerList.size() > 0)
            {
                playerIDMap.put(tmpPlayer.getId(), dbPlayerList.get(0));
+               System.out.println("Added " + tmpPlayer.getName() + " from " + tmpPlayer.getTeam() + "to list");
            }
-           if( dbPlayerList.size() == 0 || dbPlayerList.size() > 1)
+           if(dbPlayerList.size() == 0 && dbExamplePlayer.getDisplay_position().equals("TE"))
            {
+               //try without the "TE"
+               dbExamplePlayer.setDisplay_position(null);
+               List<Player> dbPlayerList2 = playersDAO.getPlayers(dbExamplePlayer);
+               if(dbPlayerList2.size() > 0)
+               {
+                   playerIDMap.put(tmpPlayer.getId(), dbPlayerList2.get(0));
+                   System.out.println("Added " + tmpPlayer.getName() + " from " + tmpPlayer.getTeam() + "to list");
+               }
+               else
+               {
+                   System.out.println("Can not find specific Player Name" + dbExamplePlayer.getName().getFirst() + " "+ dbExamplePlayer.getName().getLast() );
+                   System.out.println(" Position TE:" + dbExamplePlayer.getDisplay_position());
+                   System.out.println("Team :  "+ dbExamplePlayer.getEditorial_team_abbr());
+                   System.out.println("Database returned List of size " + dbPlayerList.size());
+               }
+
+           }
+           if( dbPlayerList.size() > 1)
+           {
+
                System.out.println("Can not find specific Player Name" + dbExamplePlayer.getName().getFirst() + " "+ dbExamplePlayer.getName().getLast() );
                System.out.println(" Position :" + dbExamplePlayer.getDisplay_position());
                System.out.println("Team : "+ dbExamplePlayer.getEditorial_team_abbr());
                System.out.println("Database returned List of size " + dbPlayerList.size());
            }
-           System.out.println("Added " + tmpPlayer.getName() + " from " + tmpPlayer.getTeam() + "to list");
+
 
         }
         System.out.println("There is " + playerList.size() + " players in the list! ");
 
     }
-    public void loadADP()
+    private void loadADP()
     {
         adpMap = new HashMap<String, FantasyFootballADP>();
-        String result = DataRequestCaller.requestData("http://football.myfantasyleague.com/2014/export?TYPE=adp&FRANCHISES=12&IS_MOCK=0&IS_PPR=0&JSON=1", "GET");
+        String result = DataRequestCaller.requestData("http://football.myfantasyleague.com/2014/export?TYPE=adp&IS_MOCK=0&IS_KEEPER=0&IS_PPR=0&JSON=1", "GET");
         Gson gson = new GsonBuilder().create();
         JsonObject jsonObject = gson.fromJson(result, JsonObject.class);
         jsonObject = jsonObject.get("adp").getAsJsonObject();

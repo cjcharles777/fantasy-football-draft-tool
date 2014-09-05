@@ -1,5 +1,6 @@
 package com.donkeigy.drafttool.gui.models;
 
+import com.donkeigy.drafttool.objects.hibernate.Player;
 import com.donkeigy.drafttool.objects.players.MFLPlayer;
 
 import javax.swing.table.AbstractTableModel;
@@ -9,9 +10,9 @@ import javax.swing.table.AbstractTableModel;
  */
 public class DraftTableModel extends AbstractTableModel
 {
-    private MFLPlayer[][] draft;
+    private Player[][] draft;
 
-    public DraftTableModel(MFLPlayer[][] draft)
+    public DraftTableModel(Player[][] draft)
     {
         this.draft = draft;
     }
@@ -26,7 +27,7 @@ public class DraftTableModel extends AbstractTableModel
     public Object getValueAt(int row, int col) {
         if(draft[row][col] != null)
         {
-            return draft[row][col].getName();
+            return draft[row][col];
         }
         return null;
     }
@@ -34,6 +35,6 @@ public class DraftTableModel extends AbstractTableModel
     @Override
     public String getColumnName(int column)
     {
-        return "Team " + column; // get list sorted by draft order
+        return "Pick " + (column +1); // get list sorted by draft order
     }
 }

@@ -4,6 +4,7 @@ import com.donkeigy.drafttool.engine.DraftEngine;
 import com.donkeigy.drafttool.engine.exception.DraftIsCompleteException;
 import com.donkeigy.drafttool.engine.exception.PlayerIsUndraftableException;
 import com.donkeigy.drafttool.objects.adp.MFLAverageDraftPosition;
+import com.donkeigy.drafttool.objects.hibernate.Player;
 import com.donkeigy.drafttool.objects.players.MFLPlayer;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public class DraftRepresentation extends JFrame
     private JPanel playerADPPanel;
     private JPanel loadPanel;
     private JButton loadYahooButton;
-    private Map<String, MFLPlayer> playerNames;
+    private Map<String, Player> playerNames;
     private DraftEngine draftEngine;
     private ApplicationContext applicationContext;
     private OAuthConnection conn;
@@ -63,14 +64,14 @@ public class DraftRepresentation extends JFrame
         this.applicationContext = applicationContext;
         conn = applicationContext.getBean(OAuthConnection.class);
         yahooDataService = applicationContext.getBean(YahooDataService.class);
-        playerNames = new HashMap<String, MFLPlayer>();
+        playerNames = new HashMap<String, Player>();
 
 
 
 
 
 
-        draftEngine = new DraftEngine(new MFLPlayer[10][12], DraftJXTable, ADPJXTable,applicationContext);
+        draftEngine = new DraftEngine(new Player[10][10], DraftJXTable, ADPJXTable,applicationContext);
         draftEngine.init();
 
 
@@ -90,7 +91,7 @@ public class DraftRepresentation extends JFrame
                 {
                     String mplPlayerStr = textField1.getText();
                     String [] mplPlayerStrData = mplPlayerStr.split(":");
-                    MFLPlayer player = playerNames.get(mplPlayerStrData[1].trim()); // helps retrieve data from the maps
+                    Player player = playerNames.get(mplPlayerStrData[1].trim()); // helps retrieve data from the maps
                     try
                     {
                         draftEngine.addToDraft(player);
@@ -160,7 +161,7 @@ public class DraftRepresentation extends JFrame
         ADPJXTable = new JXTable();
         table1 = DraftJXTable;
         table2 = ADPJXTable;
-        DraftJXTable.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
+       // DraftJXTable.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
 
 
 
